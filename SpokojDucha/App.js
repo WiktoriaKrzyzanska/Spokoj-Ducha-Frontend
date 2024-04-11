@@ -1,52 +1,40 @@
-import React from 'react'; // Import React
-import { StyleSheet, Text, View, TextInput, Button } from 'react-native'; // Import necessary components
+import * as React from "react";
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import MainPage from "./components/MainPage";
+import WelcomePage from "./components/WelcomePage";
+import LoginPage from "./components/LoginPage";
+import RegisterPage from "./components/RegisterPage";
 
-export default function App() {
-  const doLoginStuff = () => {
-    console.log('Login button pressed');
-  };
+const Stack = createNativeStackNavigator();
 
+const App = () => {
   return (
-    <View style={styles.container}>
-      <View style={styles.loginTextSection}>
-        <TextInput placeholder='UserName' style={styles.inputText} />
-        <TextInput placeholder='Password' style={styles.inputText} secureTextEntry={true}/>
-      </View>
-     
-      <View style={styles.loginButtonSection}>
-        <Button onPress={() => doLoginStuff()} 
-                title="Login"
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName="Home">
+        <Stack.Screen
+          name="Home"
+          component={MainPage}
+          options={{ title: "Welcome" }}
         />
-      </View>
-    </View>
+        <Stack.Screen
+          name="Profile"
+          component={LoginPage}
+          options={{ title: "Login" }}
+        />
+        <Stack.Screen
+          name="Register"
+          component={RegisterPage}
+          options={{ title: "Register" }}
+        />
+        <Stack.Screen
+          name="Welcome"
+          component={WelcomePage}
+          options={{ title: "Welcome!" }}
+        />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
-}
+};
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  loginTextSection: {
-    marginBottom: 20,
-  },
-  inputText: {
-    borderWidth: 1,
-    borderColor: 'gray',
-    padding: 10,
-    marginBottom: 10, 
-    width: 200, 
-  },
-  loginButtonSection: {
-    width: '100%',
-    height: '30%',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  loginButton: {
-    backgroundColor: 'blue',
-    color: 'white'
-  },
-});
+export default App;
