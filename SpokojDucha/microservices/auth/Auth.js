@@ -1,22 +1,31 @@
-import axios from 'axios';
-//the xxx should be changed for your IP
-const BASE_URL = 'http://xxx.xx.xx.xx:8080';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { tokenManagment } from './TokenManagment';
+import { BASE_URL } from '../../config/config'
 
-
-export const signUp = (firstName, lastName, email, password) => {
-  return axios.post(`${BASE_URL}/auth/signup`, {
-    firstName,
-    lastName,
-    email,
-    password,
-  });
+export const signUp = async (firstName, lastName, email, password) => {
+  try {
+    const response = await tokenManagment.post(`${BASE_URL}/auth/signup`, {
+      firstName,
+      lastName,
+      email,
+      password,
+    });
+    return response.data; 
+  } catch (error) {
+    console.error('Signup error:', error.response ? error.response.data : error);
+    throw error;
+  }
 };
 
-
-
-export const signIn = (email, password) => {
-  return axios.post(`${BASE_URL}/auth/signin`, {
-    email,
-    password,
-  });
+export const signIn = async (email, password) => {
+  try {
+      const response = await tokenManagment.post(`${BASE_URL}/auth/signin`, {
+          email,
+          password,
+      });
+      await AsyncStorage.setItem('token', response.data); 
+      return response;
+  } catch (error) {
+      throw error;
+  }
 };

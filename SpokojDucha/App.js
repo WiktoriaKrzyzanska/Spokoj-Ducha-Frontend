@@ -5,6 +5,7 @@ import MainPage from "./components/MainPage";
 import WelcomePage from "./components/WelcomePage";
 import LoginPage from "./components/LoginPage";
 import RegisterPage from "./components/RegisterPage";
+import AddCementeryPage from "./components/AddCementeryPage";
 
 const Stack = createNativeStackNavigator();
 
@@ -31,6 +32,11 @@ const App = () => {
           name="Welcome"
           component={WelcomePage}
           options={{ title: "Welcome!" }}
+        />
+        <Stack.Screen
+          name="Add cementery"
+          component={AddCementeryPage}
+          options={{title: 'Add cementery'}}
         />
       </Stack.Navigator>
     </NavigationContainer>
