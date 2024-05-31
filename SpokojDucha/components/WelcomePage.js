@@ -6,6 +6,7 @@ const WelcomePage = ({ navigation }) => {
     <View style={styles.container}>
       <Text style={styles.text}>Welcome to the App!</Text>
       <Button title="Add Cementery" onPress={() => navigation.navigate('Add cementery')} />
+      <Button title="Add Decedent" onPress={() => navigation.navigate('Add decedent')} />
       <Button title="Log Out" onPress={() => navigation.navigate('Home')} />
     </View>
   );

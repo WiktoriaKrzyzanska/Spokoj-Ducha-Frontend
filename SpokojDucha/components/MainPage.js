@@ -12,6 +12,11 @@ const MainPage = ({ navigation }) => {
           onPress={() => navigation.navigate("Register")}
           style={styles.button}
         />
+          <Button
+          title="Watch Video"
+          onPress={() => navigation.navigate("Watch video")} 
+          style={styles.button}
+        />
       </View>
     </View>
   );
