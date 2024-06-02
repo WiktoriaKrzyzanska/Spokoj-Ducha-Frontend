@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { View, TextInput, Button, Text, StyleSheet, Alert, Platform } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import { addDecedent } from '../microservices/decedent/Decedent'; 
+import { Picker } from '@react-native-picker/picker';
+import { tokenManagment } from '../microservices/auth/TokenManagment';
+import { BASE_URL } from '../config/config';
 
 const DecedentForm = () => {
   const [decedent, setDecedent] = useState({
@@ -16,10 +17,36 @@ const DecedentForm = () => {
     cemeteryId: '',
     userId: ''
   });
+  const [cemeteries, setCemeteries] = useState([]);
   const [imageUri, setImageUri] = useState('');
-  const [datePicker, setDatePicker] = useState({ birth: false, death: false });
 
   useEffect(() => {
+    const fetchCemeteries = async () => {
+      try {
+        const response = await tokenManagment.get('/api/cemetery');
+        setCemeteries(response.data);
+      } catch (error) {
+        console.error('Error fetching cemeteries:', error);
+        Alert.alert('Error', 'Failed to fetch cemeteries.');
+      }
+    };
+
+    const fetchUserId = async () => {
+      try {
+        const response = await tokenManagment.get('/user/id');
+        setDecedent(prevState => ({
+          ...prevState,
+          userId: response.data
+        }));
+      } catch (error) {
+        console.error('Error fetching user ID:', error);
+        Alert.alert('Error', 'Failed to fetch user ID.');
+      }
+    };
+
+    fetchCemeteries();
+    fetchUserId();
+
     (async () => {
       if (Platform.OS !== 'web') {
         const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -37,16 +64,6 @@ const DecedentForm = () => {
     }));
   };
 
-  const handleDateChange = (event, selectedDate, field) => {
-    const currentDate = selectedDate || decedent[field];
-    setDatePicker({ ...datePicker, [field]: false });
-    handleInputChange(field, currentDate.toISOString().split('T')[0]); 
-  };
-
-  const showDatePicker = (field) => {
-    setDatePicker({ ...datePicker, [field]: true });
-  };
-
   const selectImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -55,14 +72,36 @@ const DecedentForm = () => {
       quality: 1,
     });
 
-    if (!result.cancelled) {
-      setImageUri(result.uri);
+    if (!result.canceled) {
+      console.log('Image URI:', result.assets[0].uri);  
+      setImageUri(result.assets[0].uri);
+    } else {
+      console.log('Image selection cancelled');
     }
   };
 
   const handleSubmit = async () => {
+    const formData = new FormData();
+    formData.append('decedent', JSON.stringify(decedent));
+    if (imageUri) {
+      const response = await fetch(imageUri);
+      const blob = await response.blob();
+      formData.append('tombstoneImage', {
+        uri: imageUri,
+        name: 'tombstone.jpg', 
+        type: blob.type
+      });
+      console.log('Image Blob:', blob); 
+    } else {
+      console.log('No image selected');
+    }
+
     try {
-      const result = await addDecedent(decedent, imageUri);
+      const result = await tokenManagment.post(`${BASE_URL}/api/decedent/add`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
       Alert.alert('Success', 'Decedent added successfully!');
       console.log(result);
     } catch (error) {
@@ -85,24 +124,18 @@ const DecedentForm = () => {
         onChangeText={value => handleInputChange('surname', value)}
         value={decedent.surname}
       />
-      <Button title="Select Birth Date" onPress={() => showDatePicker('birth')} />
-      {datePicker.birth && (
-        <DateTimePicker
-          value={new Date()}
-          mode="date"
-          display="default"
-          onChange={(event, date) => handleDateChange(event, date, 'birthDate')}
-        />
-      )}
-      <Button title="Select Death Date" onPress={() => showDatePicker('death')} />
-      {datePicker.death && (
-        <DateTimePicker
-          value={new Date()}
-          mode="date"
-          display="default"
-          onChange={(event, date) => handleDateChange(event, date, 'deathDate')}
-        />
-      )}
+      <TextInput
+        placeholder="Birth Date (YYYY-MM-DD)"
+        style={styles.input}
+        onChangeText={value => handleInputChange('birthDate', value)}
+        value={decedent.birthDate}
+      />
+      <TextInput
+        placeholder="Death Date (YYYY-MM-DD)"
+        style={styles.input}
+        onChangeText={value => handleInputChange('deathDate', value)}
+        value={decedent.deathDate}
+      />
       <TextInput
         placeholder="Description"
         style={styles.input}
@@ -121,18 +154,16 @@ const DecedentForm = () => {
         onChangeText={value => handleInputChange('longitude', value)}
         value={decedent.longitude}
       />
-      <TextInput
-        placeholder="Cemetery ID"
-        style={styles.input}
-        onChangeText={value => handleInputChange('cemeteryId', value)}
-        value={decedent.cemeteryId}
-      />
-      <TextInput
-        placeholder="User ID"
-        style={styles.input}
-        onChangeText={value => handleInputChange('userId', value)}
-        value={decedent.userId}
-      />
+      <Text>Select Cemetery</Text>
+      <Picker
+        selectedValue={decedent.cemeteryId}
+        style={styles.picker}
+        onValueChange={value => handleInputChange('cemeteryId', value)}
+      >
+        {cemeteries.map(cemetery => (
+          <Picker.Item key={cemetery.id} label={cemetery.name} value={cemetery.id} />
+        ))}
+      </Picker>
       <Button title="Select Image" onPress={selectImage} />
       <Button title="Submit" onPress={handleSubmit} />
       {imageUri ? <Text>Image selected: {imageUri}</Text> : null}
@@ -150,6 +181,10 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     borderWidth: 1,
     padding: 10,
+  },
+  picker: {
+    height: 50,
+    marginBottom: 12,
   },
 });
 
