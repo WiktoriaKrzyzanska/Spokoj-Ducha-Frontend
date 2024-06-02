@@ -7,8 +7,6 @@ import LoginPage from "./components/LoginPage";
 import RegisterPage from "./components/RegisterPage";
 import AddCementeryPage from "./components/AddCementeryPage";
 import DecedentForm from "./components/DecedentForm";
-import WalkingSpeedVideo from "./components/WalkingSpeedVideo";
-import ActivityLogger from "./components/WalkingSpeedVideo";
 
 const Stack = createNativeStackNavigator();
 
@@ -46,11 +44,7 @@ const App = () => {
           component={DecedentForm}
           options={{ title: "Add decedent" }}
         />
-        <Stack.Screen
-          name="Watch video"
-          component={ActivityLogger}
-          options={{ title: "Watch" }}
-        />
+       
       </Stack.Navigator>
     </NavigationContainer>
   );
