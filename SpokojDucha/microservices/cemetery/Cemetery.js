@@ -3,7 +3,7 @@ import { BASE_URL } from '../../config/config'
 
 export const addCemetery = async (name, address) => {
   try {
-    const response = await tokenManagment.post(`${BASE_URL}/api/cementery`, {
+    const response = await tokenManagment.post(`${BASE_URL}/api/cemetery`, {
       name,
       address,
     });
