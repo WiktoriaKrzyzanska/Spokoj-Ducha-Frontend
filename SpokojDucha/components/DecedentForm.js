@@ -1,11 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { View, TextInput, Button, Text, StyleSheet, Alert, Platform } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { Picker } from '@react-native-picker/picker';
 import { tokenManagment } from '../microservices/auth/TokenManagment';
 import { BASE_URL } from '../config/config';
+import { FontSizeContext } from '../contexts/FontSizeContext';
+
 
 const DecedentForm = () => {
+  const { fontSizeDelta} = useContext(FontSizeContext);
   const [decedent, setDecedent] = useState({
     name: '',
     surname: '',
@@ -111,53 +114,54 @@ const DecedentForm = () => {
   };
 
   return (
+    
     <View style={styles.container}>
       <TextInput
         placeholder="Name"
-        style={styles.input}
+        style={[styles.input, {fontSize: 16 +fontSizeDelta}]}
         onChangeText={value => handleInputChange('name', value)}
         value={decedent.name}
       />
       <TextInput
         placeholder="Surname"
-        style={styles.input}
+        style={[styles.input, {fontSize: 16 +fontSizeDelta}]}
         onChangeText={value => handleInputChange('surname', value)}
         value={decedent.surname}
       />
       <TextInput
         placeholder="Birth Date (YYYY-MM-DD)"
-        style={styles.input}
+        style={[styles.input, {fontSize: 16 +fontSizeDelta}]}
         onChangeText={value => handleInputChange('birthDate', value)}
         value={decedent.birthDate}
       />
       <TextInput
         placeholder="Death Date (YYYY-MM-DD)"
-        style={styles.input}
+        style={[styles.input, {fontSize: 16 +fontSizeDelta}]}
         onChangeText={value => handleInputChange('deathDate', value)}
         value={decedent.deathDate}
       />
       <TextInput
         placeholder="Description"
-        style={styles.input}
+        style={[styles.input, {fontSize: 16 +fontSizeDelta}]}
         onChangeText={value => handleInputChange('description', value)}
         value={decedent.description}
       />
       <TextInput
         placeholder="Latitude"
-        style={styles.input}
+        style={[styles.input, {fontSize: 16 +fontSizeDelta}]}
         onChangeText={value => handleInputChange('latitude', value)}
         value={decedent.latitude}
       />
       <TextInput
         placeholder="Longitude"
-        style={styles.input}
+        style={[styles.input, {fontSize: 16 +fontSizeDelta}]}
         onChangeText={value => handleInputChange('longitude', value)}
         value={decedent.longitude}
       />
       <Text>Select Cemetery</Text>
       <Picker
         selectedValue={decedent.cemeteryId}
-        style={styles.picker}
+        style={[styles.picker, {fontSize: 16 +fontSizeDelta}]}
         onValueChange={value => handleInputChange('cemeteryId', value)}
       >
         {cemeteries.map(cemetery => (

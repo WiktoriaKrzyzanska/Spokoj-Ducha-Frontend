@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { StyleSheet, View, TextInput, Button, Alert, Text, TouchableOpacity } from "react-native";
 import { signIn } from "../microservices/auth/Auth";
-
+import { FontSizeContext } from '../contexts/FontSizeContext';
 const LoginPage = ({ navigation }) => {
+  const { fontSizeDelta} = useContext(FontSizeContext);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [secureTextEntry, setSecureTextEntry] = useState(true);
@@ -31,30 +32,30 @@ const LoginPage = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <View style={styles.formContainer}>
-      <Text style={styles.title}>Logowanie</Text>
+      <Text style={[styles.title, {fontSize: 24 +fontSizeDelta}]}>Logowanie</Text>
       <View style={styles.loginTextSection}>
         <TextInput
           placeholder="Email"
-          style={styles.inputText}
+          style={[styles.inputText, {fontSize: 16 +fontSizeDelta}]}
           value={email}
           onChangeText={setEmail}
         />
         <View style={styles.passwordContainer}>
           <TextInput
             placeholder="Hasło"
-            style={styles.inputText}
+            style={[styles.inputText, {fontSize: 16 +fontSizeDelta}]}
             secureTextEntry={secureTextEntry}
             value={password}
             onChangeText={setPassword}
           />
           <TouchableOpacity onPress={() => setSecureTextEntry(!secureTextEntry)} style={styles.showPasswordContainer}>
-            <Text style={styles.showPassword}>{secureTextEntry ? "Pokaż" : "Ukryj"}</Text>
+            <Text style={[styles.showPassword, {fontSize: 16 +fontSizeDelta}]}>{secureTextEntry ? "Pokaż" : "Ukryj"}</Text>
           </TouchableOpacity>
         </View>
       </View>
       </View>
       <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-        <Text style={styles.loginButtonText}>Logowanie</Text>
+        <Text style={[styles.loginButtonText, {fontSize: 16 +fontSizeDelta}]}>Logowanie</Text>
       </TouchableOpacity>
     </View>
 

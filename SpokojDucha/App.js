@@ -8,11 +8,13 @@ import RegisterPage from "./components/RegisterPage";
 import AddCementeryPage from "./components/AddCementeryPage";
 import DecedentForm from "./components/DecedentForm";
 import { TouchableOpacity, Image } from 'react-native';
-
+import SettingsPage from "./components/SettingsPage";
+import { FontSizeProvider } from "./contexts/FontSizeContext";
 const Stack = createNativeStackNavigator();
 
 const App = () => {
   return (
+    <FontSizeProvider>
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Home">
         <Stack.Screen
@@ -105,9 +107,15 @@ const App = () => {
             ),
           })}
         />
+        <Stack.Screen
+            name="Settings"
+            component={SettingsPage}
+            options={{ title: "Settings" }}
+          />
 
       </Stack.Navigator>
     </NavigationContainer>
+    </FontSizeProvider>
   );
 };
 

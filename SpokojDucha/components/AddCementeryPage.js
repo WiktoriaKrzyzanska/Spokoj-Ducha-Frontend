@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { StyleSheet, View, TextInput, Button, Alert, Platform , Text} from "react-native";
 import * as Location from 'expo-location';
 import axios from 'axios';
 import { addCemetery } from "../microservices/cemetery/Cemetery";
 import { GOOGLE_PLACES_API_KEY } from '../config/config'
-
+import { FontSizeContext } from '../contexts/FontSizeContext';
 const AddCementeryPage = ({ navigation }) => {
+  const { fontSizeDelta} = useContext(FontSizeContext);
   const [name, setName] = useState("");
   const [address, setAddress] = useState("");
   const [loading, setLoading] = useState(true);
@@ -89,13 +90,13 @@ const AddCementeryPage = ({ navigation }) => {
       <View style={styles.loginTextSection}>
         <TextInput
           placeholder="Name"
-          style={styles.inputText}
+          style={[styles.inputText, {fontSize: 16 +fontSizeDelta}]}
           value={name}
           onChangeText={setName}
         />
         <TextInput
           placeholder="Address"
-          style={styles.inputText}
+          style={[styles.inputText, {fontSize: 16 +fontSizeDelta}]}
           value={address}
           onChangeText={setAddress}
         />

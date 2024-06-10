@@ -1,22 +1,24 @@
-import React from 'react';
-import { StyleSheet, Text, View, Button, TouchableOpacity, Image } from 'react-native';
+import React, { useState, useContext, createContext } from 'react';
+import { StyleSheet, Text, View, Button, TouchableOpacity} from 'react-native';
+import { FontSizeContext } from '../contexts/FontSizeContext';
 
 const WelcomePage = ({ navigation }) => {
+  const { fontSizeDelta} = useContext(FontSizeContext);
   return (
     <View style={styles.container}>
    
-    <Text style={styles.welcomeText}>Witaj w aplikacji!</Text>
+    <Text style={[styles.welcomeText, {fontSize: 24 +fontSizeDelta}]}>Witaj w aplikacji!</Text>
     <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Add cementery')}>
-      <Text style={styles.buttonText}>Dodaj cmentarz</Text>
+      <Text style={[styles.buttonText, {fontSize: 16 +fontSizeDelta}]}>Dodaj cmentarz</Text>
     </TouchableOpacity>
     <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Add decedent')}>
-      <Text style={styles.buttonText}>Dodaj nagrobek</Text>
+      <Text style={[styles.buttonText, { fontSize: 16 +fontSizeDelta }]}>Dodaj nagrobek</Text>
     </TouchableOpacity>
     <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Search')}>
-      <Text style={styles.buttonText}>Szukaj</Text>
+      <Text style={[styles.buttonText, { fontSize: 16 +fontSizeDelta }]}>Szukaj</Text>
     </TouchableOpacity>
     <TouchableOpacity style={[styles.button, {marginTop: 100}]} onPress={() => navigation.navigate('Home')}>
-      <Text style={styles.buttonText}>Wyloguj</Text>
+      <Text style={[styles.buttonText, { fontSize: 16 +fontSizeDelta }]}>Wyloguj</Text>
     </TouchableOpacity>
   </View>
   );
@@ -31,16 +33,10 @@ const styles = StyleSheet.create({
     padding: 20,
   },
  
-  backText: {
-    color: '#5DB075',
-    fontSize: 16,
-  },
-  headerText: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
+ 
+ 
   welcomeText: {
-    fontSize: 24,
+   
     marginBottom: 20,
   },
   button: {
@@ -54,7 +50,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: '#fff',
-    fontSize: 16,
+    
     fontWeight: 'bold',
   },
 });

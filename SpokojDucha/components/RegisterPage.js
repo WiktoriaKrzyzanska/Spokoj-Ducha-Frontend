@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { StyleSheet, View, TextInput, Button, Alert, Text, TouchableOpacity } from "react-native";
 import { CheckBox } from 'react-native-elements';
 import { signUp } from "../microservices/auth/Auth";
-
+import { FontSizeContext } from '../contexts/FontSizeContext';
 const RegisterPage = ({ navigation }) => {
+  const { fontSizeDelta} = useContext(FontSizeContext);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
@@ -51,24 +52,24 @@ const RegisterPage = ({ navigation }) => {
   return (
     <View style={styles.container}>
     <View style={styles.formContainer}>
-      <Text style={styles.title}>Rejestracja</Text>
+      <Text style={[styles.title, {fontSize: 24 +fontSizeDelta}]}>Rejestracja</Text>
       <TextInput
         placeholder="Imię"
         value={firstName}
         onChangeText={setFirstName}
-        style={styles.inputText}
+        style={[styles.inputText, {fontSize: 16 +fontSizeDelta}]}
       />
       <TextInput
         placeholder="Nazwisko"
         value={lastName}
         onChangeText={setLastName}
-        style={styles.inputText}
+        style={[styles.inputText, {fontSize: 16 +fontSizeDelta}]}
       />
       <TextInput
         placeholder="Email"
         value={email}
         onChangeText={setEmail}
-        style={styles.inputText}
+        style={[styles.inputText, {fontSize: 16 +fontSizeDelta}]}
       />
       <View style={styles.passwordContainer}>
         <TextInput
@@ -76,10 +77,10 @@ const RegisterPage = ({ navigation }) => {
           value={password}
           onChangeText={setPassword}
           secureTextEntry={secureTextEntry}
-          style={styles.inputText}
+          style={[styles.inputText, {fontSize: 16 +fontSizeDelta}]}
         />
         <TouchableOpacity onPress={() => setSecureTextEntry(!secureTextEntry)} style={styles.showPasswordContainer}>
-          <Text style={styles.showPassword}>{secureTextEntry ? "Pokaż" : "Ukryj"}</Text>
+          <Text style={[styles.showPassword, {fontSize: 16 +fontSizeDelta}]}>{secureTextEntry ? "Pokaż" : "Ukryj"}</Text>
         </TouchableOpacity>
       </View>
       <View style={styles.checkboxContainer}>
@@ -89,12 +90,12 @@ const RegisterPage = ({ navigation }) => {
             onPress={() => setTermsAccepted(!termsAccepted)}
             checkedColor='#5DB075'
             containerStyle={{ backgroundColor: 'transparent', borderWidth: 0 }}
-            textStyle={styles.checkboxText}
+            textStyle={[styles.checkboxText, {fontSize: 16 +fontSizeDelta}]}
           />
         </View>
     </View>
     <TouchableOpacity style={styles.registerButton} onPress={handleRegister}>
-      <Text style={styles.registerButtonText}>Zarejestruj się</Text>
+      <Text style={[styles.registerButtonText, {fontSize: 16 +fontSizeDelta}]}>Zarejestruj się</Text>
     </TouchableOpacity>
   </View>
   );

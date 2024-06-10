@@ -1,20 +1,21 @@
-import React from "react";
+import React, { useState, useContext, createContext } from 'react';
 import { StyleSheet, Text, View, Button , TouchableOpacity, ImageBackground} from "react-native";
-
+import { FontSizeContext } from '../contexts/FontSizeContext';
 const MainPage = ({ navigation }) => {
+  const { fontSizeDelta} = useContext(FontSizeContext);
   return (
     <ImageBackground
       source={require('../assets/bgimage.png')} 
       style={styles.backgroundImage}
     >
     <View style={styles.container}>
-      <Text style={styles.title}>Spokój Ducha</Text>
+      <Text style={[styles.title, {fontSize: 24 +fontSizeDelta}]}>Spokój Ducha</Text>
       <View style={styles.buttonContainer}>
       <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("Profile")}>
-            <Text style={styles.buttonText}>Logowanie</Text>
+            <Text style={[styles.buttonText, {fontSize: 16 +fontSizeDelta}]}>Logowanie</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("Register")}>
-            <Text style={styles.buttonText}>Zarejestruj się</Text>
+            <Text style={[styles.buttonText, {fontSize: 16 +fontSizeDelta}]}>Zarejestruj się</Text>
           </TouchableOpacity>
       </View>
     </View>
