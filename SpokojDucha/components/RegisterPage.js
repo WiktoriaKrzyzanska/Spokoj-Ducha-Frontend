@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { StyleSheet, View, TextInput, Button, Alert } from "react-native";
+import { StyleSheet, View, TextInput, Button, Alert, Text, TouchableOpacity } from "react-native";
 import { signUp } from "../microservices/auth/Auth";
 
 const RegisterPage = ({ navigation }) => {
@@ -7,6 +7,7 @@ const RegisterPage = ({ navigation }) => {
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [secureTextEntry, setSecureTextEntry] = useState(true);
 
   const handleRegister = () => {
     if (
@@ -43,14 +44,16 @@ const RegisterPage = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
+    <View style={styles.formContainer}>
+      <Text style={styles.title}>Rejestracja</Text>
       <TextInput
-        placeholder="First Name"
+        placeholder="Imię"
         value={firstName}
         onChangeText={setFirstName}
         style={styles.inputText}
       />
       <TextInput
-        placeholder="Last Name"
+        placeholder="Nazwisko"
         value={lastName}
         onChangeText={setLastName}
         style={styles.inputText}
@@ -61,30 +64,79 @@ const RegisterPage = ({ navigation }) => {
         onChangeText={setEmail}
         style={styles.inputText}
       />
-      <TextInput
-        placeholder="Password"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry={true}
-        style={styles.inputText}
-      />
-      <Button title="Register" onPress={handleRegister} />
+      <View style={styles.passwordContainer}>
+        <TextInput
+          placeholder="Hasło"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry={secureTextEntry}
+          style={styles.inputText}
+        />
+        <TouchableOpacity onPress={() => setSecureTextEntry(!secureTextEntry)} style={styles.showPasswordContainer}>
+          <Text style={styles.showPassword}>{secureTextEntry ? "Pokaż" : "Ukryj"}</Text>
+        </TouchableOpacity>
+      </View>
     </View>
+    <TouchableOpacity style={styles.registerButton} onPress={handleRegister}>
+      <Text style={styles.registerButtonText}>Zarejestruj się</Text>
+    </TouchableOpacity>
+  </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#fff",
+    justifyContent: "space-between",
     padding: 20,
-    justifyContent: "center",
+  },
+  formContainer: {
+    paddingTop: 25,
+    alignItems: "center",
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 20,
   },
   inputText: {
     borderWidth: 1,
-    borderColor: "gray",
+    borderColor: "#ccc",
+    backgroundColor: "#f5f5f5",
     padding: 10,
     marginBottom: 10,
+    borderRadius: 5,
+    width: "100%",
   },
+  passwordContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    width: "100%",
+  },
+  showPasswordContainer: {
+    position: "absolute",
+    right: 10,
+    paddingRight: 10,
+  },
+  showPassword: {
+    color: "#5DB075",
+  },
+  registerButton: {
+    backgroundColor: "#5DB075",
+    paddingVertical: 15,
+    paddingHorizontal: 30,
+    borderRadius: 25,
+    alignItems: "center",
+    width: "100%",
+    marginBottom: 20,
+  },
+  registerButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+
 });
 
 export default RegisterPage;
