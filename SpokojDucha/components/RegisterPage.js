@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { StyleSheet, View, TextInput, Button, Alert, Text, TouchableOpacity } from "react-native";
+import { CheckBox } from 'react-native-elements';
 import { signUp } from "../microservices/auth/Auth";
 
 const RegisterPage = ({ navigation }) => {
@@ -8,6 +9,7 @@ const RegisterPage = ({ navigation }) => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [secureTextEntry, setSecureTextEntry] = useState(true);
+  const [termsAccepted, setTermsAccepted] = useState(false);
 
   const handleRegister = () => {
     if (
@@ -17,6 +19,10 @@ const RegisterPage = ({ navigation }) => {
       !lastName.trim()
     ) {
       Alert.alert("Registration Error", "Please fill in all fields.");
+      return;
+    }
+    if (!termsAccepted) {
+      Alert.alert("Registration Error", "You must accept the terms and conditions to register.");
       return;
     }
     signUp(firstName, lastName, email, password)
@@ -76,6 +82,16 @@ const RegisterPage = ({ navigation }) => {
           <Text style={styles.showPassword}>{secureTextEntry ? "Pokaż" : "Ukryj"}</Text>
         </TouchableOpacity>
       </View>
+      <View style={styles.checkboxContainer}>
+      <CheckBox
+            title="Zapoznałem/am się i akceptuję regulamin aplikacji Spokój Ducha"
+            checked={termsAccepted}
+            onPress={() => setTermsAccepted(!termsAccepted)}
+            checkedColor='#5DB075'
+            containerStyle={{ backgroundColor: 'transparent', borderWidth: 0 }}
+            textStyle={styles.checkboxText}
+          />
+        </View>
     </View>
     <TouchableOpacity style={styles.registerButton} onPress={handleRegister}>
       <Text style={styles.registerButtonText}>Zarejestruj się</Text>
