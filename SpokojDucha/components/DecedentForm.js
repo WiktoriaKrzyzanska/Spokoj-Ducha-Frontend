@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { View, TextInput, Button, Text, StyleSheet, Alert, Platform } from 'react-native';
+import { View, TextInput, Button, Text, StyleSheet, Alert, Platform, TouchableOpacity, Image } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { Picker } from '@react-native-picker/picker';
 import { tokenManagment } from '../microservices/auth/TokenManagment';
@@ -114,63 +114,67 @@ const DecedentForm = () => {
   };
 
   return (
-    
     <View style={styles.container}>
       <TextInput
-        placeholder="Name"
-        style={[styles.input, {fontSize: 16 +fontSizeDelta}]}
+        placeholder="Imię"
+        style={[styles.input, {fontSize: 16 + fontSizeDelta}]}
         onChangeText={value => handleInputChange('name', value)}
         value={decedent.name}
       />
       <TextInput
-        placeholder="Surname"
-        style={[styles.input, {fontSize: 16 +fontSizeDelta}]}
+        placeholder="Nazwisko"
+        style={[styles.input, {fontSize: 16 + fontSizeDelta}]}
         onChangeText={value => handleInputChange('surname', value)}
         value={decedent.surname}
       />
       <TextInput
-        placeholder="Birth Date (YYYY-MM-DD)"
-        style={[styles.input, {fontSize: 16 +fontSizeDelta}]}
+        placeholder="Data urodzenia (YYYY-MM-DD)"
+        style={[styles.input, {fontSize: 16 + fontSizeDelta}]}
         onChangeText={value => handleInputChange('birthDate', value)}
         value={decedent.birthDate}
       />
       <TextInput
-        placeholder="Death Date (YYYY-MM-DD)"
-        style={[styles.input, {fontSize: 16 +fontSizeDelta}]}
+        placeholder="Data śmierci (YYYY-MM-DD)"
+        style={[styles.input, {fontSize: 16 + fontSizeDelta}]}
         onChangeText={value => handleInputChange('deathDate', value)}
         value={decedent.deathDate}
       />
       <TextInput
-        placeholder="Description"
-        style={[styles.input, {fontSize: 16 +fontSizeDelta}]}
+        placeholder="Opis"
+        style={[styles.input, {fontSize: 16 + fontSizeDelta}]}
         onChangeText={value => handleInputChange('description', value)}
         value={decedent.description}
       />
       <TextInput
-        placeholder="Latitude"
-        style={[styles.input, {fontSize: 16 +fontSizeDelta}]}
+        placeholder="Szerokość geograficzna"
+        style={[styles.input, {fontSize: 16 + fontSizeDelta}]}
         onChangeText={value => handleInputChange('latitude', value)}
         value={decedent.latitude}
       />
       <TextInput
-        placeholder="Longitude"
-        style={[styles.input, {fontSize: 16 +fontSizeDelta}]}
+        placeholder="Długość geograficzna"
+        style={[styles.input, {fontSize: 16 + fontSizeDelta}]}
         onChangeText={value => handleInputChange('longitude', value)}
         value={decedent.longitude}
       />
-      <Text>Select Cemetery</Text>
+      <Text style={[styles.label, {fontSize: 16 + fontSizeDelta}]}>Wybierz cmentarz</Text>
       <Picker
         selectedValue={decedent.cemeteryId}
-        style={[styles.picker, {fontSize: 16 +fontSizeDelta}]}
+        style={[styles.picker, {fontSize: 16 + fontSizeDelta}]}
         onValueChange={value => handleInputChange('cemeteryId', value)}
       >
         {cemeteries.map(cemetery => (
           <Picker.Item key={cemetery.id} label={cemetery.name} value={cemetery.id} />
         ))}
       </Picker>
-      <Button title="Select Image" onPress={selectImage} />
-      <Button title="Submit" onPress={handleSubmit} />
-      {imageUri ? <Text>Image selected: {imageUri}</Text> : null}
+      <TouchableOpacity style={styles.imagePicker} onPress={selectImage}>
+        <Image source={require('../assets/upload.png')} style={styles.icon} />
+        <Text style={[styles.imagePickerText, { fontSize: 16 + fontSizeDelta }]}>Prześlij zdjęcie</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+        <Text style={[styles.buttonText, { fontSize: 16 + fontSizeDelta }]}>Dodaj</Text>
+      </TouchableOpacity>
+      {imageUri ? <Text style={[styles.imageText, {fontSize: 16 + fontSizeDelta}]}>Image selected: {imageUri}</Text> : null}
     </View>
   );
 };
@@ -180,15 +184,56 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
   },
+  imagePicker: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    backgroundColor: '#f5f5f5',
+    borderRadius: 5,
+    alignItems: 'center',
+    paddingVertical: 20,
+    marginBottom: 20,
+  },
+  icon: {
+    width: 30,
+    height: 30,
+    marginBottom: 10,
+  },
+  imagePickerText: {
+    color: '#aaa',
+  },
   input: {
     height: 40,
     marginBottom: 12,
     borderWidth: 1,
     padding: 10,
+    borderColor: '#ccc',
+    backgroundColor: '#f5f5f5',
+    borderRadius: 5,
   },
   picker: {
     height: 50,
     marginBottom: 12,
+  },
+  label: {
+    marginBottom: 5,
+    fontWeight: 'bold',
+  },
+  imageText: {
+    marginTop: 10,
+    color: 'grey',
+  },
+  button: {
+    backgroundColor: '#5DB075',
+    paddingVertical: 15,
+    paddingHorizontal: 30,
+    borderRadius: 25,
+    alignItems: 'center',
+    marginVertical: 10,
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
 
