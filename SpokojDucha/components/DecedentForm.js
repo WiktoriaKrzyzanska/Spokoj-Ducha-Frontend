@@ -1,27 +1,27 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { View, TextInput, Button, Text, StyleSheet, Alert, Platform, TouchableOpacity, Image } from 'react-native';
+import { View, TextInput, Text, StyleSheet, Alert, Platform, TouchableOpacity, Image, Modal } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { Picker } from '@react-native-picker/picker';
 import { tokenManagment } from '../microservices/auth/TokenManagment';
-import { BASE_URL } from '../config/config';
 import { FontSizeContext } from '../contexts/FontSizeContext';
-
+import Checkbox from 'expo-checkbox';
 
 const DecedentForm = () => {
-  const { fontSizeDelta} = useContext(FontSizeContext);
+  const { fontSizeDelta } = useContext(FontSizeContext);
   const [decedent, setDecedent] = useState({
     name: '',
     surname: '',
     birthDate: '',
     deathDate: '',
     description: '',
-    latitude: '',
-    longitude: '',
     cemeteryId: '',
-    userId: ''
+    userId: '',
+    city: ''
   });
   const [cemeteries, setCemeteries] = useState([]);
   const [imageUri, setImageUri] = useState('');
+  const [modalVisible, setModalVisible] = useState(true);
+  const [showPopupAgain, setShowPopupAgain] = useState(true);
 
   useEffect(() => {
     const fetchCemeteries = async () => {
@@ -100,7 +100,7 @@ const DecedentForm = () => {
     }
 
     try {
-      const result = await tokenManagment.post(`${BASE_URL}/api/decedent/add`, formData, {
+      const result = await tokenManagment.post('/api/decedent/add', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
@@ -115,6 +115,32 @@ const DecedentForm = () => {
 
   return (
     <View style={styles.container}>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalView}>
+            <Text style={styles.modalText}>Zgodnie z RODO dane osób zmarłych nie podlegają ochronie</Text>
+            <View style={styles.modalCheckbox}>
+              <Checkbox
+                style={styles.checkbox}
+                value={!showPopupAgain}
+                onValueChange={() => setShowPopupAgain(!showPopupAgain)}
+                color={!showPopupAgain ? '#4630EB' : undefined}
+              />
+              <Text style={styles.checkboxText}>Nie pokazuj ponownie</Text>
+            </View>
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => setModalVisible(!modalVisible)}
+            >
+              <Text style={styles.closeButtonText}>X</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
       <TextInput
         placeholder="Imię"
         style={[styles.input, {fontSize: 16 + fontSizeDelta}]}
@@ -146,16 +172,10 @@ const DecedentForm = () => {
         value={decedent.description}
       />
       <TextInput
-        placeholder="Szerokość geograficzna"
+        placeholder="Miasto"
         style={[styles.input, {fontSize: 16 + fontSizeDelta}]}
-        onChangeText={value => handleInputChange('latitude', value)}
-        value={decedent.latitude}
-      />
-      <TextInput
-        placeholder="Długość geograficzna"
-        style={[styles.input, {fontSize: 16 + fontSizeDelta}]}
-        onChangeText={value => handleInputChange('longitude', value)}
-        value={decedent.longitude}
+        onChangeText={value => handleInputChange('city', value)}
+        value={decedent.city}
       />
       <Text style={[styles.label, {fontSize: 16 + fontSizeDelta}]}>Wybierz cmentarz</Text>
       <Picker
@@ -234,6 +254,55 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  modalView: {
+    width: '80%',
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 20,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  modalText: {
+    fontSize: 16,
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  modalCheckbox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  checkbox: {
+    margin: 8,
+  },
+  checkboxText: {
+    marginLeft: 8,
+  },
+  closeButton: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    backgroundColor: '#ccc',
+    borderRadius: 20,
+    padding: 5,
+  },
+  closeButtonText: {
+    color: '#fff',
+    fontSize: 12,
   },
 });
 
