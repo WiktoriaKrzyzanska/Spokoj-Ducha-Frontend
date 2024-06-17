@@ -8,6 +8,7 @@ import Checkbox from 'expo-checkbox';
 
 const DecedentForm = () => {
   const { fontSizeDelta } = useContext(FontSizeContext);
+  const { fontSizeDelta } = useContext(FontSizeContext);
   const [decedent, setDecedent] = useState({
     name: '',
     surname: '',
@@ -15,6 +16,8 @@ const DecedentForm = () => {
     deathDate: '',
     description: '',
     cemeteryId: '',
+    userId: '',
+    city: ''
     userId: '',
     city: ''
   });
@@ -101,6 +104,7 @@ const DecedentForm = () => {
 
     try {
       const result = await tokenManagment.post('/api/decedent/add', formData, {
+      const result = await tokenManagment.post('/api/decedent/add', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
@@ -173,7 +177,10 @@ const DecedentForm = () => {
       />
       <TextInput
         placeholder="Miasto"
+        placeholder="Miasto"
         style={[styles.input, {fontSize: 16 + fontSizeDelta}]}
+        onChangeText={value => handleInputChange('city', value)}
+        value={decedent.city}
         onChangeText={value => handleInputChange('city', value)}
         value={decedent.city}
       />
