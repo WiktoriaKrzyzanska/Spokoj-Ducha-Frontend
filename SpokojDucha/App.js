@@ -10,6 +10,8 @@ import DecedentForm from "./components/DecedentForm";
 import { TouchableOpacity, Image } from 'react-native';
 import SettingsPage from "./components/SettingsPage";
 import { FontSizeProvider } from "./contexts/FontSizeContext";
+import SearchDecedent from "./components/SearchDecedent";
+
 const Stack = createNativeStackNavigator();
 
 const App = () => {
@@ -97,6 +99,21 @@ const App = () => {
           component={DecedentForm}
           options={({ navigation }) => ({
             title: "Dodaj grób",
+            headerRight: () => (
+              <TouchableOpacity onPress={() => navigation.navigate('Settings')}>
+                <Image
+                  style={{ width: 25, height: 25 }}
+                  source={require('./assets/settings.png')}
+                />
+              </TouchableOpacity>
+            ),
+          })}
+        />
+        <Stack.Screen
+          name="Search"
+          component={SearchDecedent}
+          options={({ navigation }) => ({
+            title: "Wyszukaj zmarłego",
             headerRight: () => (
               <TouchableOpacity onPress={() => navigation.navigate('Settings')}>
                 <Image
