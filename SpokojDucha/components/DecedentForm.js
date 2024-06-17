@@ -3,22 +3,19 @@ import { View, TextInput, Button, Text, StyleSheet, Alert, Platform, TouchableOp
 import * as ImagePicker from 'expo-image-picker';
 import { Picker } from '@react-native-picker/picker';
 import { tokenManagment } from '../microservices/auth/TokenManagment';
-import { BASE_URL } from '../config/config';
 import { FontSizeContext } from '../contexts/FontSizeContext';
 
-
 const DecedentForm = () => {
-  const { fontSizeDelta} = useContext(FontSizeContext);
+  const { fontSizeDelta } = useContext(FontSizeContext);
   const [decedent, setDecedent] = useState({
     name: '',
     surname: '',
     birthDate: '',
     deathDate: '',
     description: '',
-    latitude: '',
-    longitude: '',
     cemeteryId: '',
-    userId: ''
+    userId: '',
+    city: ''
   });
   const [cemeteries, setCemeteries] = useState([]);
   const [imageUri, setImageUri] = useState('');
@@ -100,7 +97,7 @@ const DecedentForm = () => {
     }
 
     try {
-      const result = await tokenManagment.post(`${BASE_URL}/api/decedent/add`, formData, {
+      const result = await tokenManagment.post('/api/decedent/add', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
@@ -146,16 +143,10 @@ const DecedentForm = () => {
         value={decedent.description}
       />
       <TextInput
-        placeholder="Szerokość geograficzna"
+        placeholder="Miasto"
         style={[styles.input, {fontSize: 16 + fontSizeDelta}]}
-        onChangeText={value => handleInputChange('latitude', value)}
-        value={decedent.latitude}
-      />
-      <TextInput
-        placeholder="Długość geograficzna"
-        style={[styles.input, {fontSize: 16 + fontSizeDelta}]}
-        onChangeText={value => handleInputChange('longitude', value)}
-        value={decedent.longitude}
+        onChangeText={value => handleInputChange('city', value)}
+        value={decedent.city}
       />
       <Text style={[styles.label, {fontSize: 16 + fontSizeDelta}]}>Wybierz cmentarz</Text>
       <Picker
