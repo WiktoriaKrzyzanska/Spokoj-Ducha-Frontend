@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useContext } from "react";
-import { StyleSheet, View, TextInput, Button, Alert, Platform , Text} from "react-native";
+import { StyleSheet, View, TextInput, Alert, Text, TouchableOpacity } from "react-native";
 import * as Location from 'expo-location';
 import axios from 'axios';
 import { addCemetery } from "../microservices/cemetery/Cemetery";
-import { GOOGLE_PLACES_API_KEY } from '../config/config'
+import { GOOGLE_PLACES_API_KEY } from '../config/config';
 import { FontSizeContext } from '../contexts/FontSizeContext';
-const AddCementeryPage = ({ navigation }) => {
-  const { fontSizeDelta} = useContext(FontSizeContext);
+
+const AddCemeteryPage = ({ navigation }) => {
+  const { fontSizeDelta } = useContext(FontSizeContext);
   const [name, setName] = useState("");
   const [address, setAddress] = useState("");
   const [loading, setLoading] = useState(true);
@@ -29,7 +30,7 @@ const AddCementeryPage = ({ navigation }) => {
         const response = await axios.get(`https://maps.googleapis.com/maps/api/place/nearbysearch/json`, {
           params: {
             location: `${latitude},${longitude}`,
-            radius: 2000, 
+            radius: 2000,
             type: 'cemetery',
             key: `${GOOGLE_PLACES_API_KEY}`
           }
@@ -87,24 +88,24 @@ const AddCementeryPage = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.loginTextSection}>
+      <View style={styles.inputSection}>
         <TextInput
           placeholder="Name"
-          style={[styles.inputText, {fontSize: 16 +fontSizeDelta}]}
+          style={[styles.input, { fontSize: 16 + fontSizeDelta }]}
           value={name}
           onChangeText={setName}
         />
         <TextInput
           placeholder="Address"
-          style={[styles.inputText, {fontSize: 16 +fontSizeDelta}]}
+          style={[styles.input, { fontSize: 16 + fontSizeDelta }]}
           value={address}
           onChangeText={setAddress}
         />
       </View>
 
-      <View style={styles.loginButtonSection}>
-        <Button onPress={handleAddCemetery} title="Add" />
-      </View>
+      <TouchableOpacity style={styles.button} onPress={handleAddCemetery}>
+        <Text style={[styles.buttonText, { fontSize: 16 + fontSizeDelta }]}>Add</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -112,30 +113,38 @@ const AddCementeryPage = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
+    padding: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  loginTextSection: {
+  inputSection: {
     marginBottom: 20,
+    width: '100%',
   },
-  inputText: {
+  input: {
+    height: 40,
+    marginBottom: 12,
     borderWidth: 1,
-    borderColor: "gray",
     padding: 10,
-    marginBottom: 10,
-    width: 200,
+    borderColor: '#ccc',
+    backgroundColor: '#f5f5f5',
+    borderRadius: 5,
+    width: '100%',
   },
-  loginButtonSection: {
-    width: "100%",
-    height: "30%",
-    justifyContent: "center",
-    alignItems: "center",
+  button: {
+    backgroundColor: '#5DB075',
+    paddingVertical: 15,
+    paddingHorizontal: 30,
+    borderRadius: 25,
+    alignItems: 'center',
+    marginVertical: 10,
+    width: '100%',
   },
-  loginButton: {
-    backgroundColor: "blue",
-    color: "white",
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
 
-export default AddCementeryPage;
+export default AddCemeteryPage;
