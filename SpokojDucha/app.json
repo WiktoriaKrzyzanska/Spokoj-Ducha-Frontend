@@ -38,7 +38,8 @@
         {
           "locationAlwaysAndWhenInUsePermission": "Allow SpokojDucha to use your location."
         }
-      ]
+      ],
+      "expo-video"
     ]
   }
 }

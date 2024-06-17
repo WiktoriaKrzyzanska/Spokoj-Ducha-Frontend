@@ -1,5 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { View, TextInput, Text, StyleSheet, Alert, TouchableOpacity, FlatList, Image } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { FontSizeContext } from '../contexts/FontSizeContext';
 import { tokenManagment } from '../microservices/auth/TokenManagment';
 
@@ -8,9 +9,10 @@ const SearchDecedent = () => {
   const [keywords, setKeywords] = useState({
     name: '',
     surname: '',
-    city: '', 
+    city: '',
   });
   const [results, setResults] = useState([]);
+  const navigation = useNavigation();
 
   const handleInputChange = (name, value) => {
     setKeywords(prevState => ({
@@ -55,6 +57,22 @@ const SearchDecedent = () => {
     }
   };
 
+  const handleNavigate = (id) => {
+    if (isNaN(id)) {
+      Alert.alert('Invalid ID', 'The decedent ID is not valid.');
+      return;
+    }
+    navigation.navigate('NavigatePage', { id });
+  };
+
+  const handleUploadVideo = (id) => {
+    if (isNaN(id)) {
+      Alert.alert('Invalid ID', 'The decedent ID is not valid.');
+      return;
+    }
+    navigation.navigate('UploadVideo', { id });
+  };
+
   const renderItem = ({ item }) => (
     <View style={styles.resultItem}>
       {item.imageBase64 && (
@@ -70,10 +88,10 @@ const SearchDecedent = () => {
         <Text style={[styles.resultText, { fontSize: 16 + fontSizeDelta }]}>Opis: {item.description}</Text>
         <Text style={[styles.resultText, { fontSize: 16 + fontSizeDelta }]}>Miasto: {item.city}</Text>
         <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.button}>
+          <TouchableOpacity style={styles.button} onPress={() => handleNavigate(item.id)}>
             <Text style={[styles.buttonText, { fontSize: 16 + fontSizeDelta }]}>Nawiguj</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.button}>
+          <TouchableOpacity style={styles.button} onPress={() => handleUploadVideo(item.id)}>
             <Text style={[styles.buttonText, { fontSize: 16 + fontSizeDelta }]}>Dodaj film</Text>
           </TouchableOpacity>
         </View>
@@ -176,6 +194,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     borderRadius: 5,
     marginRight: 10,
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
   },
 });
 
