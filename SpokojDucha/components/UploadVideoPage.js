@@ -3,6 +3,7 @@ import { View, Text, Button, StyleSheet, Alert, TouchableOpacity, Image, Platfor
 import * as ImagePicker from 'expo-image-picker';
 import { tokenManagment } from '../microservices/auth/TokenManagment';
 import { Video } from 'expo-av';
+import { MaterialIcons } from '@expo/vector-icons';
 
 const UploadVideoPage = ({ route }) => {
   const { id } = route.params;
@@ -16,6 +17,10 @@ const UploadVideoPage = ({ route }) => {
         const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
         if (status !== 'granted') {
           Alert.alert('Permission Required', 'We need camera roll permissions to make this work!');
+        }
+        const { status: cameraStatus } = await ImagePicker.requestCameraPermissionsAsync();
+        if (cameraStatus !== 'granted') {
+          Alert.alert('Permission Required', 'We need camera permissions to make this work!');
         }
       }
     })();
@@ -38,6 +43,27 @@ const UploadVideoPage = ({ route }) => {
       }
     } catch (error) {
       console.log('VideoPicker Error: ', error);
+      Alert.alert('Error', error.message);
+    }
+  };
+
+  const recordVideo = async () => {
+    const options = {
+      mediaTypes: ImagePicker.MediaTypeOptions.Videos,
+      allowsEditing: true,
+      quality: 1,
+    };
+
+    try {
+      const result = await ImagePicker.launchCameraAsync(options);
+      console.log('Camera result: ', result);
+      if (!result.canceled) {
+        setVideoUri(result.assets[0].uri);
+      } else {
+        console.log('User cancelled video recording');
+      }
+    } catch (error) {
+      console.log('Camera Error: ', error);
       Alert.alert('Error', error.message);
     }
   };
@@ -78,10 +104,16 @@ const UploadVideoPage = ({ route }) => {
   return (
     <View style={styles.container}>
       <Text style={styles.header}>Dodaj film</Text>
-      <TouchableOpacity style={styles.imagePicker} onPress={selectVideo}>
-        <Image source={require('../assets/upload.png')} style={styles.icon} />
-        <Text style={styles.imagePickerText}>Wybierz video</Text>
-      </TouchableOpacity>
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity style={styles.imagePicker} onPress={selectVideo}>
+          <Image source={require('../assets/upload.png')} style={styles.icon} />
+          <Text style={styles.imagePickerText}>Wybierz video</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.imagePicker} onPress={recordVideo}>
+          <MaterialIcons name="videocam" size={30} color="grey" />
+          <Text style={styles.imagePickerText}>Nagraj video</Text>
+        </TouchableOpacity>
+      </View>
       {videoUri && (
         <View>
           <Video
@@ -123,6 +155,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 20,
   },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+  },
   imagePicker: {
     borderWidth: 1,
     borderColor: '#ccc',
@@ -131,7 +168,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 20,
     marginBottom: 20,
-    width: '80%',
+    width: '45%',
   },
   icon: {
     width: 30,
