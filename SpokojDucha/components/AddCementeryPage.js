@@ -91,13 +91,13 @@ const AddCemeteryPage = ({ navigation }) => {
       <View style={styles.inputSection}>
         <TextInput
           placeholder="Name"
-          style={[styles.input, { fontSize: 16 + fontSizeDelta }]}
+          style={[styles.input, { fontSize: 16 + fontSizeDelta, paddingVertical: 10 + fontSizeDelta * 0.25 }]}
           value={name}
           onChangeText={setName}
         />
         <TextInput
           placeholder="Address"
-          style={[styles.input, { fontSize: 16 + fontSizeDelta }]}
+          style={[styles.input, { fontSize: 16 + fontSizeDelta, paddingVertical: 10 + fontSizeDelta * 0.25 }]}
           value={address}
           onChangeText={setAddress}
         />
@@ -122,8 +122,6 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   input: {
-    height: 40,
-    marginBottom: 12,
     borderWidth: 1,
     padding: 10,
     borderColor: '#ccc',
@@ -142,7 +140,6 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: '#fff',
-    fontSize: 16,
     fontWeight: 'bold',
   },
 });

@@ -2,25 +2,22 @@ import React, { useState, useContext, createContext } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { FontSizeContext } from '../contexts/FontSizeContext';
 
-
-
 const SettingsPage = ({ navigation }) => {
-    const { fontSizeDelta, increaseFontSize, decreaseFontSize } = useContext(FontSizeContext);
-
+  const { fontSizeDelta, increaseFontSize, decreaseFontSize } = useContext(FontSizeContext);
 
   return (
     <View style={styles.container}>
-      <Text style={[styles.title, {fontSize: 24 +fontSizeDelta}]}>Modyfikuj czcionkę</Text>
+      <Text style={[styles.title, {fontSize: 24 + fontSizeDelta}]}>Modyfikuj czcionkę</Text>
       <View style={styles.buttonRow}>
         <TouchableOpacity style={styles.button} onPress={increaseFontSize}>
-          <Text style={[styles.buttonText, {fontSize: 17 +fontSizeDelta}]}>A↑</Text>
+          <Text style={[styles.buttonText, {fontSize: 17 + fontSizeDelta}]}>A↑</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.button} onPress={decreaseFontSize}>
-          <Text style={[styles.buttonText, {fontSize: 14 +fontSizeDelta}]}>A↓</Text>
+          <Text style={[styles.buttonText, {fontSize: 14 + fontSizeDelta}]}>A↓</Text>
         </TouchableOpacity>
       </View>
       <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Authors')}>
-        <Text style={[styles.buttonText, {fontSize: 16 +fontSizeDelta}]}>O autorach</Text>
+        <Text style={[styles.buttonText, {fontSize: 16 + fontSizeDelta}]}>O autorach</Text>
       </TouchableOpacity>
     </View>
   );
@@ -35,7 +32,6 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   title: {
-    
     fontWeight: 'bold',
     marginBottom: 20,
   },
@@ -53,8 +49,8 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: '#fff',
-    
     fontWeight: 'bold',
   },
 });
+
 export default SettingsPage;

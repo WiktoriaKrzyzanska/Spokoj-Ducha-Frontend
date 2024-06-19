@@ -15,12 +15,6 @@ const SearchDecedent = () => {
   const [selectedImage, setSelectedImage] = useState(null);
   const navigation = useNavigation();
 
-  const formatDate = (dateArray) => {
-    if (!dateArray || !Array.isArray(dateArray) || dateArray.length < 3) return '';
-    const [year, month, day] = dateArray;
-    return `${year}-${month.toString().padStart(2, '0')}`;
-  };
-
   const handleInputChange = (name, value) => {
     setKeywords(prevState => ({
       ...prevState,
@@ -64,98 +58,29 @@ const SearchDecedent = () => {
     }
   };
 
-  const handleNavigate = (id) => {
-    if (isNaN(id)) {
-      Alert.alert('Invalid ID', 'The decedent ID is not valid.');
-      return;
-    }
-    navigation.navigate('NavigatePage', { id });
-  };
-
-  const handleUploadVideo = (id) => {
-    if (isNaN(id)) {
-      Alert.alert('Invalid ID', 'The decedent ID is not valid.');
-      return;
-    }
-    navigation.navigate('UploadVideo', { id });
-  };
-
-  const renderItem = ({ item }) => (
-    <View style={styles.resultItem}>
-      {item.imageBase64 && (
-        <TouchableOpacity onPress={() => setSelectedImage(item.imageBase64)}>
-          <Image
-            source={{ uri: `data:image/png;base64,${item.imageBase64}` }}
-            style={styles.image}
-          />
-        </TouchableOpacity>
-      )}
-      <View style={styles.textContainer}>
-        <Text style={[styles.boldText, { fontSize: 16 + fontSizeDelta }]}>{item.name} {item.surname}</Text>
-        <Text style={[styles.resultText, { fontSize: 16 + fontSizeDelta }]}>Data urodzenia: {formatDate(item.birthDate)}</Text>
-        <Text style={[styles.resultText, { fontSize: 16 + fontSizeDelta }]}>Data śmierci: {formatDate(item.deathDate)}</Text>
-        <Text style={[styles.resultText, { fontSize: 16 + fontSizeDelta }]}>Opis: {item.description}</Text>
-        <Text style={[styles.resultText, { fontSize: 16 + fontSizeDelta }]}>Miasto: {item.city}</Text>
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.button} onPress={() => handleNavigate(item.id)}>
-            <Text style={[styles.buttonText, { fontSize: 16 + fontSizeDelta }]}>Nawiguj</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.button} onPress={() => handleUploadVideo(item.id)}>
-            <Text style={[styles.buttonText, { fontSize: 16 + fontSizeDelta }]}>Dodaj film</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    </View>
-  );
-
   return (
     <View style={styles.container}>
       <TextInput
         placeholder="Name"
-        style={[styles.input, { fontSize: 16 + fontSizeDelta }]}
+        style={[styles.input, { fontSize: 16 + fontSizeDelta, paddingVertical: 10 + fontSizeDelta * 0.25 }]} 
         onChangeText={value => handleInputChange('name', value)}
         value={keywords.name}
       />
       <TextInput
         placeholder="Surname"
-        style={[styles.input, { fontSize: 16 + fontSizeDelta }]}
+        style={[styles.input, { fontSize: 16 + fontSizeDelta, paddingVertical: 10 + fontSizeDelta * 0.25 }]}
         onChangeText={value => handleInputChange('surname', value)}
         value={keywords.surname}
       />
       <TextInput
         placeholder="City"
-        style={[styles.input, { fontSize: 16 + fontSizeDelta }]}
+        style={[styles.input, { fontSize: 16 + fontSizeDelta, paddingVertical: 10 + fontSizeDelta * 0.25 }]}
         onChangeText={value => handleInputChange('city', value)}
         value={keywords.city}
       />
       <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
         <Text style={[styles.buttonText, { fontSize: 16 + fontSizeDelta }]}>Szukaj</Text>
       </TouchableOpacity>
-      {results.length > 0 && (
-        <FlatList
-          data={results}
-          renderItem={renderItem}
-          keyExtractor={item => (item.id ? item.id.toString() : Math.random().toString())}
-          contentContainerStyle={styles.resultsContainer}
-        />
-      )}
-      <Modal
-        visible={selectedImage !== null}
-        transparent={true}
-        animationType="fade"
-        onRequestClose={() => setSelectedImage(null)}
-      >
-        <TouchableWithoutFeedback onPress={() => setSelectedImage(null)}>
-          <View style={styles.modalBackground}>
-            {selectedImage && (
-              <Image
-                source={{ uri: `data:image/png;base64,${selectedImage}` }}
-                style={styles.fullScreenImage}
-              />
-            )}
-          </View>
-        </TouchableWithoutFeedback>
-      </Modal>
     </View>
   );
 };
@@ -166,13 +91,12 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   input: {
-    height: 40,
     marginBottom: 12,
     borderWidth: 1,
-    padding: 10,
     borderColor: '#ccc',
     backgroundColor: '#f5f5f5',
     borderRadius: 5,
+    width: "100%",
   },
   searchButton: {
     backgroundColor: '#5DB075',
@@ -184,53 +108,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: '#fff',
-    fontSize: 16,
     fontWeight: 'bold',
-  },
-  resultsContainer: {
-    marginTop: 20,
-  },
-  resultItem: {
-    flexDirection: 'row',
-    padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
-  },
-  image: {
-    width: 50,
-    height: 50,
-    marginRight: 10,
-  },
-  textContainer: {
-    flex: 1,
-  },
-  boldText: {
-    fontWeight: 'bold',
-  },
-  resultText: {
-    fontSize: 16,
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    marginTop: 10,
-  },
-  button: {
-    backgroundColor: '#5DB075',
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    borderRadius: 5,
-    marginRight: 10,
-  },
-  fullScreenImage: {
-    width: '90%',
-    height: '90%',
-    resizeMode: 'contain',
-  },
-  modalBackground: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.9)',
-    justifyContent: 'center',
-    alignItems: 'center',
   },
 });
 
