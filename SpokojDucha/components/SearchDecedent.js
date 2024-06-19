@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { View, TextInput, Text, StyleSheet, Alert, TouchableOpacity, FlatList, Image } from 'react-native';
+import { View, TextInput, Text, StyleSheet, Alert, TouchableOpacity, FlatList, Image, Modal, TouchableWithoutFeedback } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { FontSizeContext } from '../contexts/FontSizeContext';
 import { tokenManagment } from '../microservices/auth/TokenManagment';
@@ -12,7 +12,14 @@ const SearchDecedent = () => {
     city: '',
   });
   const [results, setResults] = useState([]);
+  const [selectedImage, setSelectedImage] = useState(null);
   const navigation = useNavigation();
+
+  const formatDate = (dateArray) => {
+    if (!dateArray || !Array.isArray(dateArray) || dateArray.length < 3) return '';
+    const [year, month, day] = dateArray;
+    return `${year}-${month.toString().padStart(2, '0')}`;
+  };
 
   const handleInputChange = (name, value) => {
     setKeywords(prevState => ({
@@ -76,15 +83,17 @@ const SearchDecedent = () => {
   const renderItem = ({ item }) => (
     <View style={styles.resultItem}>
       {item.imageBase64 && (
-        <Image
-          source={{ uri: `data:image/png;base64,${item.imageBase64}` }}
-          style={styles.image}
-        />
+        <TouchableOpacity onPress={() => setSelectedImage(item.imageBase64)}>
+          <Image
+            source={{ uri: `data:image/png;base64,${item.imageBase64}` }}
+            style={styles.image}
+          />
+        </TouchableOpacity>
       )}
       <View style={styles.textContainer}>
         <Text style={[styles.boldText, { fontSize: 16 + fontSizeDelta }]}>{item.name} {item.surname}</Text>
-        <Text style={[styles.resultText, { fontSize: 16 + fontSizeDelta }]}>Data urodzenia: {item.birthDate}</Text>
-        <Text style={[styles.resultText, { fontSize: 16 + fontSizeDelta }]}>Data śmierci: {item.deathDate}</Text>
+        <Text style={[styles.resultText, { fontSize: 16 + fontSizeDelta }]}>Data urodzenia: {formatDate(item.birthDate)}</Text>
+        <Text style={[styles.resultText, { fontSize: 16 + fontSizeDelta }]}>Data śmierci: {formatDate(item.deathDate)}</Text>
         <Text style={[styles.resultText, { fontSize: 16 + fontSizeDelta }]}>Opis: {item.description}</Text>
         <Text style={[styles.resultText, { fontSize: 16 + fontSizeDelta }]}>Miasto: {item.city}</Text>
         <View style={styles.buttonContainer}>
@@ -119,7 +128,7 @@ const SearchDecedent = () => {
         onChangeText={value => handleInputChange('city', value)}
         value={keywords.city}
       />
-      <TouchableOpacity style={styles.button} onPress={handleSearch}>
+      <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
         <Text style={[styles.buttonText, { fontSize: 16 + fontSizeDelta }]}>Szukaj</Text>
       </TouchableOpacity>
       {results.length > 0 && (
@@ -130,6 +139,23 @@ const SearchDecedent = () => {
           contentContainerStyle={styles.resultsContainer}
         />
       )}
+      <Modal
+        visible={selectedImage !== null}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setSelectedImage(null)}
+      >
+        <TouchableWithoutFeedback onPress={() => setSelectedImage(null)}>
+          <View style={styles.modalBackground}>
+            {selectedImage && (
+              <Image
+                source={{ uri: `data:image/png;base64,${selectedImage}` }}
+                style={styles.fullScreenImage}
+              />
+            )}
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
     </View>
   );
 };
@@ -148,7 +174,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f5f5f5',
     borderRadius: 5,
   },
-  button: {
+  searchButton: {
     backgroundColor: '#5DB075',
     paddingVertical: 15,
     paddingHorizontal: 30,
@@ -195,9 +221,16 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginRight: 10,
   },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
+  fullScreenImage: {
+    width: '90%',
+    height: '90%',
+    resizeMode: 'contain',
+  },
+  modalBackground: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.9)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 
