@@ -1,10 +1,11 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { View, TextInput, Text, StyleSheet, Alert, Platform, TouchableOpacity, Image, Modal } from 'react-native';
+import React, { useState, useEffect, useContext, useRef } from 'react';
+import { View, TextInput, Text, StyleSheet, Alert, Platform, TouchableOpacity, Image, Modal, ScrollView } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { Picker } from '@react-native-picker/picker';
 import { tokenManagment } from '../microservices/auth/TokenManagment';
 import { FontSizeContext } from '../contexts/FontSizeContext';
 import Checkbox from 'expo-checkbox';
+import { Ionicons } from '@expo/vector-icons';
 
 const DecedentForm = () => {
   const { fontSizeDelta } = useContext(FontSizeContext);
@@ -22,6 +23,7 @@ const DecedentForm = () => {
   const [imageUri, setImageUri] = useState('');
   const [modalVisible, setModalVisible] = useState(true);
   const [showPopupAgain, setShowPopupAgain] = useState(true);
+  const pickerRef = useRef();
 
   useEffect(() => {
     const fetchCemeteries = async () => {
@@ -52,9 +54,10 @@ const DecedentForm = () => {
 
     (async () => {
       if (Platform.OS !== 'web') {
-        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-        if (status !== 'granted') {
-          Alert.alert('Permission Required', 'We need camera roll permissions to make this work!');
+        const { status: cameraStatus } = await ImagePicker.requestCameraPermissionsAsync();
+        const { status: libraryStatus } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (cameraStatus !== 'granted' || libraryStatus !== 'granted') {
+          Alert.alert('Permission Required', 'We need camera and media library permissions to make this work!');
         }
       }
     })();
@@ -67,16 +70,26 @@ const DecedentForm = () => {
     }));
   };
 
-  const selectImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
+  const selectImage = async (source) => {
+    let result;
+    if (source === 'camera') {
+      result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+      });
+    } else {
+      result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+      });
+    }
 
     if (!result.canceled) {
-      console.log('Image URI:', result.assets[0].uri);  
+      console.log('Image URI:', result.assets[0].uri);
       setImageUri(result.assets[0].uri);
     } else {
       console.log('Image selection cancelled');
@@ -91,10 +104,10 @@ const DecedentForm = () => {
       const blob = await response.blob();
       formData.append('tombstoneImage', {
         uri: imageUri,
-        name: 'tombstone.jpg', 
+        name: 'tombstone.jpg',
         type: blob.type
       });
-      console.log('Image Blob:', blob); 
+      console.log('Image Blob:', blob);
     } else {
       console.log('No image selected');
     }
@@ -114,9 +127,9 @@ const DecedentForm = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView contentContainerStyle={styles.container}>
       <Modal
-        animationType="slide"
+        animationType="fade"
         transparent={true}
         visible={modalVisible}
       >
@@ -143,66 +156,97 @@ const DecedentForm = () => {
       </Modal>
       <TextInput
         placeholder="Imię"
-        style={[styles.input, {fontSize: 16 + fontSizeDelta}]}
+        style={[styles.input, { fontSize: 16 + fontSizeDelta }]}
         onChangeText={value => handleInputChange('name', value)}
         value={decedent.name}
       />
       <TextInput
         placeholder="Nazwisko"
-        style={[styles.input, {fontSize: 16 + fontSizeDelta}]}
+        style={[styles.input, { fontSize: 16 + fontSizeDelta }]}
         onChangeText={value => handleInputChange('surname', value)}
         value={decedent.surname}
       />
       <TextInput
         placeholder="Data urodzenia (YYYY-MM-DD)"
-        style={[styles.input, {fontSize: 16 + fontSizeDelta}]}
+        style={[styles.input, { fontSize: 16 + fontSizeDelta }]}
         onChangeText={value => handleInputChange('birthDate', value)}
         value={decedent.birthDate}
       />
       <TextInput
         placeholder="Data śmierci (YYYY-MM-DD)"
-        style={[styles.input, {fontSize: 16 + fontSizeDelta}]}
+        style={[styles.input, { fontSize: 16 + fontSizeDelta }]}
         onChangeText={value => handleInputChange('deathDate', value)}
         value={decedent.deathDate}
       />
       <TextInput
         placeholder="Opis"
-        style={[styles.input, {fontSize: 16 + fontSizeDelta}]}
+        style={[styles.input, { fontSize: 16 + fontSizeDelta }]}
         onChangeText={value => handleInputChange('description', value)}
         value={decedent.description}
       />
       <TextInput
         placeholder="Miasto"
-        style={[styles.input, {fontSize: 16 + fontSizeDelta}]}
+        style={[styles.input, { fontSize: 16 + fontSizeDelta }]}
         onChangeText={value => handleInputChange('city', value)}
         value={decedent.city}
       />
-      <Text style={[styles.label, {fontSize: 16 + fontSizeDelta}]}>Wybierz cmentarz</Text>
-      <Picker
-        selectedValue={decedent.cemeteryId}
-        style={[styles.picker, {fontSize: 16 + fontSizeDelta}]}
-        onValueChange={value => handleInputChange('cemeteryId', value)}
-      >
-        {cemeteries.map(cemetery => (
-          <Picker.Item key={cemetery.id} label={cemetery.name} value={cemetery.id} />
-        ))}
-      </Picker>
-      <TouchableOpacity style={styles.imagePicker} onPress={selectImage}>
-        <Image source={require('../assets/upload.png')} style={styles.icon} />
-        <Text style={[styles.imagePickerText, { fontSize: 16 + fontSizeDelta }]}>Prześlij zdjęcie</Text>
-      </TouchableOpacity>
+      <Text style={[styles.label, { fontSize: 16 + fontSizeDelta }]}>Wybierz cmentarz</Text>
+      <View style={styles.pickerContainer}>
+        <Picker
+          ref={pickerRef}
+          selectedValue={decedent.cemeteryId}
+          style={styles.picker}
+          onValueChange={(value, index) => handleInputChange('cemeteryId', value)}
+          mode="dropdown"
+          itemStyle={styles.pickerItem}
+        >
+          {cemeteries.map(cemetery => (
+            <Picker.Item key={cemetery.id} label={cemetery.name} value={cemetery.id} />
+          ))}
+        </Picker>
+      </View>
+      <View style={styles.imagePickerContainer}>
+        <TouchableOpacity style={styles.imagePicker} onPress={() => selectImage('library')}>
+          <Ionicons name="image-outline" size={30} color="grey" />
+          <Text style={[styles.imagePickerText, { fontSize: 16 + fontSizeDelta }]}>Prześlij zdjęcie</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.imagePicker} onPress={() => selectImage('camera')}>
+          <Ionicons name="camera-outline" size={30} color="grey" />
+          <Text style={[styles.imagePickerText, { fontSize: 16 + fontSizeDelta }]}>Zrób zdjęcie</Text>
+        </TouchableOpacity>
+      </View>
       <TouchableOpacity style={styles.button} onPress={handleSubmit}>
         <Text style={[styles.buttonText, { fontSize: 16 + fontSizeDelta }]}>Dodaj</Text>
       </TouchableOpacity>
-      {imageUri ? <Text style={[styles.imageText, {fontSize: 16 + fontSizeDelta}]}>Image selected: {imageUri}</Text> : null}
-    </View>
+      {imageUri ? <Text style={[styles.imageText, { fontSize: 16 + fontSizeDelta }]}>Image selected: {imageUri}</Text> : null}
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
     padding: 20,
+  },
+  pickerContainer: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    marginBottom: 12,
+    backgroundColor: '#f5f5f5',
+    overflow: 'hidden',
+  },
+  picker: {
+    height: 50,
+    width: '100%',
+  },
+  pickerItem: {
+    fontSize: 16,
+    height: 44,
+  },
+  imagePickerContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
   imagePicker: {
     borderWidth: 1,
@@ -212,6 +256,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 20,
     marginBottom: 20,
+    width: '48%',
   },
   icon: {
     width: 30,
@@ -229,10 +274,6 @@ const styles = StyleSheet.create({
     borderColor: '#ccc',
     backgroundColor: '#f5f5f5',
     borderRadius: 5,
-  },
-  picker: {
-    height: 50,
-    marginBottom: 12,
   },
   label: {
     marginBottom: 5,
