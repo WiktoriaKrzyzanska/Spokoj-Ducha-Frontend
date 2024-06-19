@@ -120,8 +120,12 @@ const DecedentForm = () => {
       });
       Alert.alert('Success', 'Decedent added successfully!');
       console.log(result);
-    } catch (error) {
-      Alert.alert('Error', 'Failed to add decedent: ' + error.message);
+    }catch (error) {
+      if (error.response && error.response.data) {
+        Alert.alert('Error', 'Failed to add decedent: ' + error.response.data);
+      } else {
+        Alert.alert('Error', 'Failed to add decedent: ' + error.message);
+      }
       console.error(error);
     }
   };
