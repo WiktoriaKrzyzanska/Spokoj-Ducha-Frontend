@@ -16,7 +16,7 @@ const AddCemeteryPage = ({ navigation }) => {
     const requestLocationPermission = async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
-        Alert.alert('Permission Denied', 'Location permission is required to fetch the nearest cemetery.');
+        Alert.alert('Wymagane uprawnienia', 'Uprawnienia lokalizacji są wymagane do pobrania najbliższego cmentarza');
         setLoading(false);
         return;
       }
@@ -41,11 +41,11 @@ const AddCemeteryPage = ({ navigation }) => {
           setName(cemeteryData.name);
           setAddress(cemeteryData.vicinity);
         } else {
-          Alert.alert('Fetch Error', 'Unable to fetch nearest cemetery.');
+          Alert.alert('Błąd pobierania', 'Pobieranie najbliższego cmentarza nie powiodło się.');
         }
       } catch (error) {
         console.error(error);
-        Alert.alert('Fetch Error', 'An error occurred while fetching the nearest cemetery.');
+        Alert.alert('Błąd pobierania', 'Pobieranie najbliższego cmentarza nie powiodło się.');
       } finally {
         setLoading(false);
       }
@@ -56,32 +56,32 @@ const AddCemeteryPage = ({ navigation }) => {
 
   const handleAddCemetery = () => {
     if (!name.trim() || !address.trim()) {
-      Alert.alert("Adding Error", "Name and address are required.");
+      Alert.alert("Błąd dodawania", "Nazwa i adres są wymagane");
       return;
     }
     addCemetery(name, address)
       .then((response) => {
         Alert.alert(
-          "Success",
-          `The cemetery with name: ${name} and address: ${address} was added successfully to the database.`,
+          "Sukces",
+          `Cmentarz o nazwie: ${name} i adresie: ${address} został dodany do bazy danych.`,
           [
             { text: "OK", onPress: () => navigation.navigate("Welcome") }
           ]
         );
       })
       .catch((error) => {
-        let errorMessage = "Adding failed. Please try again.";
+        let errorMessage = "Dodawanie nie powiodło się. Spróbuj ponownie.";
         if (error.response && error.response.data && error.response.data.message) {
           errorMessage = error.response.data.message;
         }
-        Alert.alert("Adding Error", errorMessage, [{ text: "OK" }]);
+        Alert.alert("Błąd dodawania", errorMessage, [{ text: "OK" }]);
       });
   };
 
   if (loading) {
     return (
       <View style={styles.container}>
-        <Text>Loading...</Text>
+        <Text>Ładowanie...</Text>
       </View>
     );
   }
@@ -90,21 +90,21 @@ const AddCemeteryPage = ({ navigation }) => {
     <View style={styles.container}>
       <View style={styles.inputSection}>
         <TextInput
-          placeholder="Name"
-          style={[styles.input, { fontSize: 16 + fontSizeDelta }]}
+          placeholder="Nazwa"
+          style={[styles.input, { fontSize: 16 + fontSizeDelta, minHeight: 40 + fontSizeDelta }]}
           value={name}
           onChangeText={setName}
         />
         <TextInput
-          placeholder="Address"
-          style={[styles.input, { fontSize: 16 + fontSizeDelta }]}
+          placeholder="Adres"
+          style={[styles.input, { fontSize: 16 + fontSizeDelta, minHeight: 40 + fontSizeDelta }]}
           value={address}
           onChangeText={setAddress}
         />
       </View>
 
       <TouchableOpacity style={styles.button} onPress={handleAddCemetery}>
-        <Text style={[styles.buttonText, { fontSize: 16 + fontSizeDelta }]}>Add</Text>
+        <Text style={[styles.buttonText, { fontSize: 16 + fontSizeDelta }]}>Dodaj</Text>
       </TouchableOpacity>
     </View>
   );
