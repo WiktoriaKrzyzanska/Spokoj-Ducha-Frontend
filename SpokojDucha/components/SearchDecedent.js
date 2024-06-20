@@ -30,7 +30,7 @@ const SearchDecedent = () => {
 
   const handleSearch = async () => {
     if (keywords.name.length < 2 && keywords.surname.length < 2) {
-      Alert.alert('Error', 'Please enter at least 2 characters for either name or surname.');
+      Alert.alert('Błąd', 'Wpisz chociaż dwie pierwsze litery imienia lub nazwiska.');
       return;
     }
 
@@ -49,24 +49,24 @@ const SearchDecedent = () => {
         setResults(response.data);
       } else if (response.status === 404) {
         setResults([]);
-        Alert.alert('No Results', 'No decedents found.');
+        Alert.alert('Brak wyników', 'Nie znaleziono zmarłych.');
       }
     } catch (error) {
       console.error('Error searching decedents:', error);
       if (error.response && error.response.status === 403) {
-        Alert.alert('Error', 'You do not have permission to perform this action.');
+        Alert.alert('Błąd', 'Nie masz uprawnień aby wykonać tą czynność.');
       } else if (error.response && error.response.status === 404) {
         setResults([]);
-        Alert.alert('No Results', 'No decedents found.');
+        Alert.alert('Brak wyników', 'Nie znaleziono zmarłych.');
       } else {
-        Alert.alert('Error', `Failed to search decedents: ${error.message}`);
+        Alert.alert('Błąd', `Nie udało się wyszukać zmarłego: ${error.message}`);
       }
     }
   };
 
   const handleNavigate = (id) => {
     if (isNaN(id)) {
-      Alert.alert('Invalid ID', 'The decedent ID is not valid.');
+      Alert.alert('Nieprawidłowe ID', 'ID zmarłego nie jest prawidłowe');
       return;
     }
     navigation.navigate('NavigatePage', { id });
@@ -74,7 +74,7 @@ const SearchDecedent = () => {
 
   const handleUploadVideo = (id) => {
     if (isNaN(id)) {
-      Alert.alert('Invalid ID', 'The decedent ID is not valid.');
+      Alert.alert('Nieprawidłowe ID', 'ID zmarłego nie jest prawidłowe');
       return;
     }
     navigation.navigate('UploadVideo', { id });
@@ -90,7 +90,7 @@ const SearchDecedent = () => {
           />
         </TouchableOpacity>
       )}
-      <View style={styles.textContainer}>
+      <View style={[styles.textContainer,{minHeight: 40 + fontSizeDelta}]}>
         <Text style={[styles.boldText, { fontSize: 16 + fontSizeDelta }]}>{item.name} {item.surname}</Text>
         <Text style={[styles.resultText, { fontSize: 16 + fontSizeDelta }]}>Data urodzenia: {formatDate(item.birthDate)}</Text>
         <Text style={[styles.resultText, { fontSize: 16 + fontSizeDelta }]}>Data śmierci: {formatDate(item.deathDate)}</Text>
@@ -111,20 +111,20 @@ const SearchDecedent = () => {
   return (
     <View style={styles.container}>
       <TextInput
-        placeholder="Name"
-        style={[styles.input, { fontSize: 16 + fontSizeDelta }]}
+        placeholder="Imię"
+        style={[styles.input, { fontSize: 16 + fontSizeDelta, minHeight: 40 + fontSizeDelta }]}
         onChangeText={value => handleInputChange('name', value)}
         value={keywords.name}
       />
       <TextInput
-        placeholder="Surname"
-        style={[styles.input, { fontSize: 16 + fontSizeDelta }]}
+        placeholder="Nazwisko"
+        style={[styles.input, { fontSize: 16 + fontSizeDelta, minHeight: 40 + fontSizeDelta }]}
         onChangeText={value => handleInputChange('surname', value)}
         value={keywords.surname}
       />
       <TextInput
-        placeholder="City"
-        style={[styles.input, { fontSize: 16 + fontSizeDelta }]}
+        placeholder="Miasto"
+        style={[styles.input, { fontSize: 16 + fontSizeDelta, minHeight: 40 + fontSizeDelta }]}
         onChangeText={value => handleInputChange('city', value)}
         value={keywords.city}
       />
