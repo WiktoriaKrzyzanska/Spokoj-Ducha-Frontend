@@ -154,7 +154,7 @@ const styles = StyleSheet.create({
   errorText: {
     color: "red",
     fontSize: 14,
-    marginBottom: 5,
+    marginBottom: 10,
   },
   errorInput: {
     borderColor: "red",
