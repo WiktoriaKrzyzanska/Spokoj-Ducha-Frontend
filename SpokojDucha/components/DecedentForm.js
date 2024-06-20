@@ -23,6 +23,7 @@ const DecedentForm = () => {
   const [imageUri, setImageUri] = useState('');
   const [modalVisible, setModalVisible] = useState(true);
   const [showPopupAgain, setShowPopupAgain] = useState(true);
+  const [errors, setErrors] = useState({});
   const pickerRef = useRef();
 
   useEffect(() => {
@@ -32,7 +33,7 @@ const DecedentForm = () => {
         setCemeteries(response.data);
       } catch (error) {
         console.error('Error fetching cemeteries:', error);
-        Alert.alert('Error', 'Failed to fetch cemeteries.');
+        Alert.alert('Błąd', 'Błąd w pobieraniu cmentarzy.');
       }
     };
 
@@ -45,7 +46,7 @@ const DecedentForm = () => {
         }));
       } catch (error) {
         console.error('Error fetching user ID:', error);
-        Alert.alert('Error', 'Failed to fetch user ID.');
+        Alert.alert('Błąd', 'Nie udało się pobrać ID użytkownika.');
       }
     };
 
@@ -57,7 +58,7 @@ const DecedentForm = () => {
         const { status: cameraStatus } = await ImagePicker.requestCameraPermissionsAsync();
         const { status: libraryStatus } = await ImagePicker.requestMediaLibraryPermissionsAsync();
         if (cameraStatus !== 'granted' || libraryStatus !== 'granted') {
-          Alert.alert('Permission Required', 'We need camera and media library permissions to make this work!');
+          Alert.alert('Uprawnienia wymagane', 'Zezwól na dostęp do kamery i plików!');
         }
       }
     })();
@@ -96,7 +97,86 @@ const DecedentForm = () => {
     }
   };
 
+  const validateDate = (dateString) => {
+    const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+    if (!dateRegex.test(dateString)) {
+      return "Data musi być w formacie YYYY-MM-DD.";
+    }
+
+    const [year, month, day] = dateString.split('-').map(Number);
+    const currentDate = new Date();
+
+    if (month < 1 || month > 12) {
+      return "Niepoprawny miesiąc.";
+    }
+
+    if (day < 1 || day > 31) {
+      return "Niepoprawny dzień.";
+    }
+
+    const date = new Date(year, month - 1, day);
+    if (date > currentDate) {
+      return "Data nie może być w przyszłości.";
+    }
+
+    return null;
+  };
+
+  const validateFields = () => {
+    let valid = true;
+    let newErrors = {};
+
+    const nameRegex = /^[A-Z][a-zA-Z]*$/;
+
+    if (!decedent.name.trim()) {
+      newErrors.name = "Imię jest wymagane.";
+      valid = false;
+    } else if (!nameRegex.test(decedent.name)) {
+      newErrors.name = "Imię musi zaczynać się wielką literą i zawierać tylko litery.";
+      valid = false;
+    }
+
+    if (!decedent.surname.trim()) {
+      newErrors.surname = "Nazwisko jest wymagane.";
+      valid = false;
+    } else if (!nameRegex.test(decedent.surname)) {
+      newErrors.surname = "Nazwisko musi zaczynać się wielką literą i zawierać tylko litery.";
+      valid = false;
+    }
+
+    if (decedent.birthDate.trim()) {
+      const birthDateError = validateDate(decedent.birthDate);
+      if (birthDateError) {
+        newErrors.birthDate = birthDateError;
+        valid = false;
+      }
+    }
+
+    if (decedent.deathDate.trim()) {
+      const deathDateError = validateDate(decedent.deathDate);
+      if (deathDateError) {
+        newErrors.deathDate = deathDateError;
+        valid = false;
+      }
+      if (decedent.birthDate.trim() && !newErrors.birthDate) {
+        const birthDate = new Date(decedent.birthDate);
+        const deathDate = new Date(decedent.deathDate);
+        if (birthDate > deathDate) {
+          newErrors.deathDate = "Data śmierci nie może być przed datą urodzenia.";
+          valid = false;
+        }
+      }
+    }
+
+    setErrors(newErrors);
+    return valid;
+  };
+
   const handleSubmit = async () => {
+    if (!validateFields()) {
+      return;
+    }
+
     const formData = new FormData();
     formData.append('decedent', JSON.stringify(decedent));
     if (imageUri) {
@@ -118,13 +198,13 @@ const DecedentForm = () => {
           'Content-Type': 'multipart/form-data'
         }
       });
-      Alert.alert('Success', 'Decedent added successfully!');
+      Alert.alert('Sukces', 'Grób dodany!');
       console.log(result);
-    }catch (error) {
+    } catch (error) {
       if (error.response && error.response.data) {
-        Alert.alert('Error', 'Failed to add decedent: ' + error.response.data);
+        Alert.alert('Błąd', 'Nie udało się dodać grobu: ' + error.response.data);
       } else {
-        Alert.alert('Error', 'Failed to add decedent: ' + error.message);
+        Alert.alert('Błąd', 'Nie udało się dodać grobu: ' + error.message);
       }
       console.error(error);
     }
@@ -160,40 +240,44 @@ const DecedentForm = () => {
       </Modal>
       <TextInput
         placeholder="Imię"
-        style={[styles.input, { fontSize: 16 + fontSizeDelta }]}
+        style={[styles.input, { fontSize: 16 + fontSizeDelta, minHeight: 40 + fontSizeDelta }, errors.name ? styles.errorInput : null]}
         onChangeText={value => handleInputChange('name', value)}
         value={decedent.name}
       />
+      {errors.name && <Text style={[styles.errorText, { fontSize: 16 + fontSizeDelta }]}>{errors.name}</Text>}
       <TextInput
         placeholder="Nazwisko"
-        style={[styles.input, { fontSize: 16 + fontSizeDelta }]}
+        style={[styles.input, { fontSize: 16 + fontSizeDelta, minHeight: 40 + fontSizeDelta }, errors.surname ? styles.errorInput : null]}
         onChangeText={value => handleInputChange('surname', value)}
         value={decedent.surname}
       />
+      {errors.surname && <Text style={[styles.errorText, { fontSize: 16 + fontSizeDelta }]}>{errors.surname}</Text>}
       <TextInput
-        placeholder="Data urodzenia (YYYY-MM-DD)"
-        style={[styles.input, { fontSize: 16 + fontSizeDelta }]}
+        placeholder="Data urodzenia [YYYY-MM-DD] (opcjonalne)"
+        style={[styles.input, { fontSize: 16 + fontSizeDelta, minHeight: 40 + fontSizeDelta }, errors.birthDate ? styles.errorInput : null]}
         onChangeText={value => handleInputChange('birthDate', value)}
         value={decedent.birthDate}
       />
+      {errors.birthDate && <Text style={[styles.errorText, { fontSize: 16 + fontSizeDelta }]}>{errors.birthDate}</Text>}
       <TextInput
-        placeholder="Data śmierci (YYYY-MM-DD)"
-        style={[styles.input, { fontSize: 16 + fontSizeDelta }]}
+        placeholder="Data śmierci [YYYY-MM-DD] (opcjonalne)"
+        style={[styles.input, { fontSize: 16 + fontSizeDelta, minHeight: 40 + fontSizeDelta }, errors.deathDate ? styles.errorInput : null]}
         onChangeText={value => handleInputChange('deathDate', value)}
         value={decedent.deathDate}
       />
+      {errors.deathDate && <Text style={[styles.errorText, { fontSize: 16 + fontSizeDelta }]}>{errors.deathDate}</Text>}
       <TextInput
-        placeholder="Opis"
-        style={[styles.input, { fontSize: 16 + fontSizeDelta }]}
+        placeholder="Opis (opcjonalne)"
+        style={[styles.input, { fontSize: 16 + fontSizeDelta, minHeight: 40 + fontSizeDelta }]}
         onChangeText={value => handleInputChange('description', value)}
         value={decedent.description}
       />
-      <TextInput
+      {/* <TextInput
         placeholder="Miasto"
-        style={[styles.input, { fontSize: 16 + fontSizeDelta }]}
+        style={[styles.input, { fontSize: 16 + fontSizeDelta, minHeight: 40 + fontSizeDelta }]}
         onChangeText={value => handleInputChange('city', value)}
         value={decedent.city}
-      />
+      /> */}
       <Text style={[styles.label, { fontSize: 16 + fontSizeDelta }]}>Wybierz cmentarz</Text>
       <View style={styles.pickerContainer}>
         <Picker
@@ -348,6 +432,14 @@ const styles = StyleSheet.create({
   closeButtonText: {
     color: '#fff',
     fontSize: 12,
+  },
+  errorText: {
+    color: "red",
+    fontSize: 14,
+    marginBottom: 10,
+  },
+  errorInput: {
+    borderColor: "red",
   },
 });
 
