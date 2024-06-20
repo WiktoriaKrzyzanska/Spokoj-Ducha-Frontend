@@ -13,7 +13,7 @@ import { FontSizeProvider } from "./contexts/FontSizeContext";
 import SearchDecedent from "./components/SearchDecedent";
 import UploadVideo from "./components/UploadVideoPage";
 import NavigatePage from "./components/NavigationPage";
-
+import AuthorsPage from "./components/AuthorsPage";
 const Stack = createNativeStackNavigator();
 
 
@@ -141,6 +141,11 @@ const App = () => {
             name="NavigatePage"
             component={NavigatePage}
             options={{ title: "Navigate" }}
+          />
+           <Stack.Screen
+            name="Authors"
+            component={AuthorsPage}
+            options={{ title: "O autorach" }}
           />
         </Stack.Navigator>
       </NavigationContainer>
