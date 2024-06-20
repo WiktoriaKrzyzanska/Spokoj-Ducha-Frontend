@@ -4,13 +4,26 @@ export const FontSizeContext = createContext();
 
 export const FontSizeProvider = ({ children }) => {
   const [fontSizeDelta, setFontSizeDelta] = useState(0);
-
+  const MIN_FONT_SIZE_DELTA = -10;
+  const MAX_FONT_SIZE_DELTA = 10;
   const increaseFontSize = () => {
-    setFontSizeDelta((prevDelta) => prevDelta + 2);
+    setFontSizeDelta((prevDelta) => {
+      if (prevDelta < MAX_FONT_SIZE_DELTA) {
+        return prevDelta + 2;
+      } else {
+        return prevDelta;
+      }
+    });
   };
 
   const decreaseFontSize = () => {
-    setFontSizeDelta((prevDelta) => prevDelta - 2);
+    setFontSizeDelta((prevDelta) => {
+      if (prevDelta > MIN_FONT_SIZE_DELTA) {
+        return prevDelta - 2;
+      } else {
+        return prevDelta;
+      }
+    });
   };
 
   return (
